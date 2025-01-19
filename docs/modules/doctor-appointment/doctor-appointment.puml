@@ -1,0 +1,67 @@
+@startuml Doctor Appointment Module
+
+package "Domain (Core)" {
+	class DoctorAppointment {
+		+ id: UUID
+		+ doctorId: UUID
+		+ status: AppointmentStatus
+		+ updateStatus(status: AppointmentStatus)
+	}
+	
+	enum AppointmentStatus {
+		SCHEDULED
+		COMPLETED
+		CANCELLED
+	}
+}
+
+package "Ports" {
+	package "Primary (Input) Ports" {
+		interface DoctorAppointmentQueryUseCase {
+			+ getUpcomingAppointments(doctorId: UUID): List<DoctorAppointment>
+		}
+		
+		interface AppointmentStatusUpdateUseCase {
+			+ updateStatus(appointmentId: UUID, status: AppointmentStatus)
+		}
+	}
+	
+	package "Secondary (Output) Ports" {
+		interface DoctorAppointmentPersistencePort {
+			+ save(appointment: DoctorAppointment)
+			+ findByDoctorId(doctorId: UUID): List<DoctorAppointment>
+		}
+		
+		interface NotificationPort {
+			+ sendStatusUpdate(appointment: DoctorAppointment)
+		}
+	}
+}
+
+package "Adapters" {
+	package "Primary (Input) Adapters" {
+		class DoctorAppointmentController {
+			+ getUpcomingAppointments(doctorId: UUID)
+			+ updateAppointmentStatus(appointmentId: UUID, status: AppointmentStatus)
+		}
+	}
+	
+	package "Secondary (Output) Adapters" {
+		class DoctorAppointmentPersistenceAdapter {
+			+ save(appointment: DoctorAppointment)
+			+ findByDoctorId(doctorId: UUID)
+		}
+		
+		class NotificationAdapter {
+			+ sendStatusUpdate(appointment: DoctorAppointment)
+		}
+	}
+}
+
+' Dependencies
+DoctorAppointmentController --> DoctorAppointmentQueryUseCase
+DoctorAppointmentController --> AppointmentStatusUpdateUseCase
+DoctorAppointmentPersistenceAdapter ..|> DoctorAppointmentPersistencePort
+NotificationAdapter ..|> NotificationPort
+
+@enduml

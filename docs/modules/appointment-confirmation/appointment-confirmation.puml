@@ -1,0 +1,17 @@
+@startuml Appointment Confirmation Module
+
+' Simple two-class architecture
+class AppointmentConfirmationController {
+	+ confirmAppointment(appointmentId: UUID): Boolean
+	+ getConfirmationStatus(appointmentId: UUID): String
+}
+
+class AppointmentConfirmationService {
+	+ confirmAppointment(appointmentId: UUID): Boolean
+	+ getConfirmationStatus(appointmentId: UUID): String
+}
+
+' Direct dependency
+AppointmentConfirmationController --> AppointmentConfirmationService
+
+@enduml

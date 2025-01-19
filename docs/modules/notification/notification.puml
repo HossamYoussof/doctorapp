@@ -1,0 +1,23 @@
+@startuml Notification Module
+
+package "Notification Module" {
+	class AppointmentNotificationService {
+		- logger: Logger
+		+ sendConfirmationNotifications(appointment: Appointment, timeSlot: TimeSlot)
+	}
+}
+
+package "External Dependencies" {
+	package "appointmentbooking.domain" {
+		class Appointment
+	}
+	
+	package "doctoravailability.domain" {
+		class TimeSlot
+	}
+}
+
+AppointmentNotificationService ..> Appointment : uses
+AppointmentNotificationService ..> TimeSlot : uses
+
+@enduml

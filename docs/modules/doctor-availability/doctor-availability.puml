@@ -1,0 +1,71 @@
+@startuml Doctor Availability Module
+
+package "API Layer" {
+	class TimeSlotController {
+		+ createTimeSlot(timeSlot: TimeSlot)
+		+ getAllTimeSlots()
+		+ getTimeSlot(id: UUID)
+		+ updateTimeSlot(id: UUID, updatedSlot: TimeSlot)
+		+ deleteTimeSlot(id: UUID)
+	}
+}
+
+package "Domain Layer" {
+	interface TimeSlotService {
+		+ createTimeSlot(timeSlot: TimeSlot): TimeSlot
+		+ getAllTimeSlots(): List<TimeSlot>
+		+ getTimeSlot(id: UUID): TimeSlot?
+		+ updateTimeSlot(id: UUID, updatedSlot: TimeSlot): TimeSlot?
+		+ deleteTimeSlot(id: UUID): Boolean
+	}
+	
+	class TimeSlot {
+		+ id: UUID
+		+ time: LocalDateTime
+		+ doctorId: UUID
+		+ doctorName: String
+		+ isReserved: Boolean
+		+ cost: BigDecimal
+	}
+}
+
+package "Infrastructure Layer" {
+	class TimeSlotServiceImpl {
+		+ createTimeSlot(timeSlot: TimeSlot): TimeSlot
+		+ getAllTimeSlots(): List<TimeSlot>
+		+ getTimeSlot(id: UUID): TimeSlot?
+		+ updateTimeSlot(id: UUID, updatedSlot: TimeSlot): TimeSlot?
+		+ deleteTimeSlot(id: UUID): Boolean
+	}
+	
+	interface TimeSlotRepository {
+		+ save(timeSlot: TimeSlotEntity): TimeSlotEntity
+		+ findAll(): List<TimeSlotEntity>
+		+ findById(id: UUID): TimeSlotEntity?
+		+ delete(id: UUID): Boolean
+	}
+	
+	class TimeSlotEntity {
+		+ id: UUID
+		+ time: LocalDateTime
+		+ doctorId: UUID
+		+ doctorName: String
+		+ isReserved: Boolean
+		+ cost: BigDecimal
+	}
+	
+	class TimeSlotPersistenceAdapter {
+		+ toEntity(timeSlot: TimeSlot): TimeSlotEntity
+		+ toDomain(entity: TimeSlotEntity): TimeSlot
+	}
+}
+
+' Layer Dependencies
+TimeSlotController --> TimeSlotService
+TimeSlotService --> TimeSlot
+TimeSlotServiceImpl ..|> TimeSlotService
+TimeSlotServiceImpl --> TimeSlotRepository
+TimeSlotRepository --> TimeSlotEntity
+TimeSlotPersistenceAdapter --> TimeSlotEntity
+
+@enduml

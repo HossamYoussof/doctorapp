@@ -1,0 +1,100 @@
+@startuml Doctor Appointment System - Modular Monolith
+
+skinparam package {
+	BackgroundColor White
+	BorderColor Black
+}
+
+rectangle "Doctor Appointment System" {
+	package "Application Core" {
+		package "Doctor Module" #LightBlue {
+			[Doctor Management] as DM
+			[Availability Management] as AM
+			database "Doctor Store" as DS
+		}
+
+		package "Appointment Module" #LightGreen {
+			[Appointment Booking] as AB
+			[Appointment Confirmation] as AC
+			database "Appointment Store" as AS
+		}
+
+		package "Patient Module" #LightYellow {
+			[Patient Management] as PM
+			database "Patient Store" as PS
+		}
+
+		package "Notification Module" #LightPink {
+			[Notification Service] as NS
+			[Email Service] as ES
+			[SMS Service] as SMS
+		}
+
+		package "Shared Kernel" {
+			[Domain Events] as DE
+			[Common Models] as CM
+			[Utilities] as UT
+		}
+	}
+
+	package "API Layer" {
+		[REST Controllers] as RC
+		[API Gateway] as AG
+	}
+
+	package "Infrastructure" {
+		database "PostgreSQL Database" as DB
+		[External Services] as EXT
+	}
+}
+
+' API Layer Dependencies
+AG --> RC
+RC --> DM
+RC --> AB
+RC --> PM
+RC --> NS
+
+' Module Internal Dependencies
+DM --> DS
+AM --> DS
+AB --> AS
+AC --> AS
+PM --> PS
+
+' Cross-Module Communication
+AB --> AM : "checks availability"
+AB --> PM : "validates patient"
+AC --> NS : "sends notifications"
+NS --> ES : "email channel"
+NS --> SMS : "SMS channel"
+
+' Infrastructure Dependencies
+DS --> DB
+AS --> DB
+PS --> DB
+NS --> EXT
+
+' Event-Based Communication
+DM ..> DE
+AB ..> DE
+AC ..> DE
+NS ..> DE : "subscribes"
+
+' Shared Kernel Usage
+DM --> CM
+AB --> CM
+PM --> CM
+NS --> CM
+
+note right of DE
+  Domain events for
+  loose coupling between modules
+end note
+
+note right of CM
+  Shared domain models
+  and interfaces
+end note
+
+@enduml

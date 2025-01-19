@@ -1,0 +1,62 @@
+@startuml Appointment Booking Module
+
+package "Domain Layer" {
+	class Appointment {
+		+ id: UUID
+		+ patientId: UUID
+		+ doctorId: UUID
+		+ timeSlot: TimeSlot
+		+ status: AppointmentStatus
+	}
+}
+
+package "Application Layer" {
+	package "Ports" {
+		interface BookAppointmentUseCase {
+			+ bookAppointment(request: BookAppointmentRequest): Appointment
+		}
+		
+		interface AppointmentPort {
+			+ save(appointment: Appointment): Appointment
+			+ findById(id: UUID): Appointment?
+		}
+		
+		interface TimeSlotQueryPort {
+			+ findAvailableSlots(): List<TimeSlot>
+		}
+	}
+	
+	class BookAppointmentService {
+		+ bookAppointment(request: BookAppointmentRequest): Appointment
+	}
+}
+
+package "Adapters Layer" {
+	package "Input Adapters" {
+		class AppointmentController {
+			+ bookAppointment(request: BookAppointmentRequest)
+			+ getAvailableSlots()
+		}
+	}
+	
+	package "Output Adapters" {
+		class AppointmentPersistenceAdapter {
+			+ save(appointment: Appointment)
+			+ findById(id: UUID)
+		}
+		
+		class TimeSlotAdapter {
+			+ findAvailableSlots()
+		}
+	}
+}
+
+' Dependencies
+BookAppointmentService ..|> BookAppointmentUseCase
+AppointmentController --> BookAppointmentUseCase
+AppointmentPersistenceAdapter ..|> AppointmentPort
+TimeSlotAdapter ..|> TimeSlotQueryPort
+BookAppointmentService --> AppointmentPort
+BookAppointmentService --> TimeSlotQueryPort
+
+@enduml
