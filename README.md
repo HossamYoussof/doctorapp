@@ -4,7 +4,7 @@ A modular doctor appointment management system demonstrating different architect
 
 ## System Architecture
 
-![Doctor Appointment System - Modular Monolith](out/docs/architecture/Doctor%20Appointment%20System%20-%20Modular%20Monolith.png)
+![Doctor Appointment System - Modular Monolith](docs/Doctor%20Appointment%20System%20-%20Modular%20Monolith.png)
 
 The system consists of four main modules, each implementing a different architectural pattern:
 
